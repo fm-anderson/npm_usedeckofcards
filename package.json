@@ -1,0 +1,16 @@
+{
+  "name": "usedeckofcards",
+  "version": "0.0.1",
+  "description": "React hook to interact with the Deck of Cards API.",
+  "main": "./src/useDeckOfCards.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "usedeckofcards",
+    "deck of cards",
+    "deck of cards api"
+  ],
+  "author": "fm-anderson",
+  "license": "MIT"
+}
