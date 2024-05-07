@@ -1,10 +1,14 @@
 {
   "name": "usedeckofcards",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "React hook to interact with the Deck of Cards API.",
   "main": "./src/useDeckOfCards.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fm-anderson/npm_usedeckofcards.git"
   },
   "keywords": [
     "usedeckofcards",
