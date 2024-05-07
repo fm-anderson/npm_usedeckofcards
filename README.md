@@ -40,13 +40,55 @@ function CardGame() {
 export default CardGame;
 ```
 
-## API
+## API Integration
 
-The useDeckOfCards hook provides the following data and methods:
+The hook interacts with the Deck of Cards API to manage the deck. The following API calls are used:
 
-- `deckId`: String | null - The current deck's ID.
-- `cardsRemaining`: Number - The number of cards remaining in the deck.
-- `pileCards`: Array - An array containing the cards currently in the piles.
-- `drawAndAddToPile(pileName, count)`: Function - Draws a specified number of cards from the deck and adds them to a pile.
-- `resetGame()`: Function - Resets the deck, shuffling all cards back into the deck.
-- `initializeDeck()`: Function - Initializes the deck with any stored settings or creates a new deck if none exist.
+**1. Shuffle New Deck**
+
+```jsx
+const response = await shuffleNewDeck(deckCount);
+```
+
+- `deckCount` The number of decks to shuffle (default is 1).
+- `Response:`
+  - `deck_id` The ID of the new deck.
+
+**2. Draw Cards**
+
+```jsx
+const response = await drawCards(deckId, count);
+```
+
+- `deckId` The ID of the deck to draw from.
+- `count` The number of cards to draw.
+- `Response:`
+  - `cards` An array of drawn cards.
+
+**3. Reshuffle Deck**
+
+```jsx
+const response = await reshuffleDeck(deckId, remaining);
+```
+
+- `deckId` The ID of the deck to reshuffle.
+- `remaining` A boolean indicating whether to only shuffle the remaining cards.
+
+**4. Add to Pile**
+
+```jsx
+const response = await addToPile(deckId, pileName, cards);
+```
+
+- `deckId` The ID of the deck.
+- `pileName` The name of the pile.
+- `cards` The codes of the cards to add to the pile.
+
+**5. List and Fetch Pile Cards**
+
+```jsx
+const response = await listPileCards(deckId, pileName);
+```
+
+- `deckId` The ID of the deck.
+- `pileName` The name of the pile.
