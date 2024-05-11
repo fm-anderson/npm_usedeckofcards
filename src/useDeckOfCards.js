@@ -3,11 +3,12 @@ import { getFromLocalStorage, saveToLocalStorage } from "./utils/helper";
 import {
   applyDeckData,
   reshuffleDeck,
-  drawCards,
+  drawFromMainDeck,
   addToPile,
   listPileCards,
   initializeDeckWithPile,
   fetchPileCards,
+  drawFromPile,
 } from "./utils/api";
 
 function useDeckOfCards() {
@@ -80,7 +81,7 @@ function useDeckOfCards() {
         return;
       }
 
-      if (!/^[a-zA-Z0-9]+$/.test(pileName)) {
+      if (!/^[a-zA-Z0-9-_]+$/.test(pileName)) {
         console.warn(
           "Invalid pile name: The pile name must consist only of alphanumeric characters without any spaces or special characters."
         );
@@ -88,7 +89,7 @@ function useDeckOfCards() {
       }
 
       try {
-        const result = await drawCards(deckId, count);
+        const result = await drawFromMainDeck(deckId, count);
 
         if (result.success) {
           setCardsRemaining(result.remaining);
@@ -111,6 +112,70 @@ function useDeckOfCards() {
         }
       } catch (error) {
         console.error("Failed to draw and add to pile:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [deckId, isLoading]
+  );
+
+  const moveCardsBetweenPiles = useCallback(
+    async (sourcePile, targetPile, cards) => {
+      setIsLoading(true);
+
+      if (!deckId || isLoading) {
+        console.warn(
+          "Action skipped: no deck ID or operation is currently loading."
+        );
+        return;
+      }
+
+      try {
+        const drawResult = await drawFromPile(deckId, sourcePile, cards);
+
+        if (drawResult.success && drawResult.cards.length > 0) {
+          const drawnCards = drawResult.cards
+            .map((card) => card.code)
+            .join(",");
+
+          const addToPileResult = await addToPile(
+            deckId,
+            targetPile,
+            drawnCards
+          );
+
+          if (addToPileResult.success) {
+            const updatedSourcePile = await listPileCards(deckId, sourcePile);
+            const updatedTargetPile = await listPileCards(deckId, targetPile);
+
+            setPileCards((prev) => [
+              ...prev.filter(
+                (card) =>
+                  card.pileName !== sourcePile && card.pileName !== targetPile
+              ),
+              ...updatedSourcePile.piles[sourcePile].cards.map((card) => ({
+                ...card,
+                pileName: sourcePile,
+              })),
+              ...updatedTargetPile.piles[targetPile].cards.map((card) => ({
+                ...card,
+                pileName: targetPile,
+              })),
+            ]);
+          } else {
+            console.warn(
+              "Failed to add cards to the target pile:",
+              addToPileResult.error
+            );
+          }
+        } else {
+          console.warn(
+            "Failed to draw cards from the source pile:",
+            drawResult.error
+          );
+        }
+      } catch (error) {
+        console.error("Failed to move cards between piles:", error);
       } finally {
         setIsLoading(false);
       }
@@ -153,12 +218,13 @@ function useDeckOfCards() {
 
   return {
     deckId,
-    cardsRemaining,
     isLoading,
     pileCards,
+    cardsRemaining,
+    moveCardsBetweenPiles,
     drawAndAddToPile,
-    resetGame,
     initializeDeck,
+    resetGame,
   };
 }
 

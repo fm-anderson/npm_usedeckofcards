@@ -39,7 +39,7 @@ export const applyDeckData = async (deckId) => {
   return fetchAndHandle(url);
 };
 
-export const drawCards = async (deckId, count = 1) => {
+export const drawFromMainDeck = async (deckId, count = 1) => {
   if (!deckId) throw new Error("Invalid deck ID");
 
   const url = `${baseUrl}/${deckId}/draw/?count=${count}`;
@@ -47,7 +47,9 @@ export const drawCards = async (deckId, count = 1) => {
 };
 
 export const reshuffleDeck = async (deckId, remaining = false) => {
-  const url = `${baseUrl}/${deckId}/shuffle/${remaining ? "?remaining=true" : ""}`;
+  const url = `${baseUrl}/${deckId}/shuffle/${
+    remaining ? "?remaining=true" : ""
+  }`;
   return fetchAndHandle(url);
 };
 
@@ -87,4 +89,9 @@ export const initializeDeckWithPile = async (deckCount = 1) => {
     return newDeckData;
   }
   return newDeckData;
+};
+
+export const drawFromPile = async (deckId, pileName, cards) => {
+  const url = `${baseUrl}/${deckId}/pile/${pileName}/draw/?cards=${cards}`;
+  return fetchAndHandle(url);
 };
