@@ -17,27 +17,35 @@ Here's a quick example to get you started:
 ```jsx
 import useDeckOfCards from "usedeckofcards";
 
-function CardGame() {
+function App() {
   const {
     deckId,
     cardsRemaining,
     pileCards,
     drawAndAddToPile,
+    moveCardsBetweenPiles,
     resetGame,
     initializeDeck,
   } = useDeckOfCards();
+
+  const handleMoveCards = () => {
+    const cards = pileCards.map((card) => card.code).join(",");
+    // Example: Move cards from "hand" pile to "discard" pile
+    moveCardsBetweenPiles("hand", "discard", cards);
+  };
 
   return (
     <div>
       <h1>Deck ID: {deckId}</h1>
       <p>Cards Remaining: {cardsRemaining}</p>
       <button onClick={() => drawAndAddToPile("discard", 1)}>Draw Card</button>
+      <button onClick={handleMoveCards}>Move Cards</button>
       <button onClick={resetGame}>Reset Deck</button>
     </div>
   );
 }
 
-export default CardGame;
+export default App;
 ```
 
 ## API Integration
@@ -57,7 +65,7 @@ const response = await shuffleNewDeck(deckCount);
 **2. Draw Cards**
 
 ```jsx
-const response = await drawCards(deckId, count);
+const response = await drawFromMainDeck(deckId, count);
 ```
 
 - `deckId` The ID of the deck to draw from.
@@ -92,3 +100,13 @@ const response = await listPileCards(deckId, pileName);
 
 - `deckId` The ID of the deck.
 - `pileName` The name of the pile.
+
+**6. Move Cards Between Piles**
+
+```jsx
+const response = await moveCardsBetweenPiles(sourcePile, targetPile, cards);
+```
+
+- `sourcePile` The name of the source pile.
+- `targetPile` The name of the target pile.
+- `cards` A comma-separated string of card codes to move.
