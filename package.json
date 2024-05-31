@@ -1,8 +1,9 @@
 {
   "name": "usedeckofcards",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "React hook to interact with the Deck of Cards API.",
   "main": "./src/useDeckOfCards.js",
+  "types": "./types/useDeckOfCards.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -20,5 +21,9 @@
     "deck of cards api"
   ],
   "author": "fm-anderson",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "typescript": "^5.4.5"
+  }
 }
