@@ -10,6 +10,10 @@ Install `usedeckofcards` with npm:
 npm install usedeckofcards
 ```
 
+## TypeScript Support
+
+`usedeckofcards` includes TypeScript type definitions. This is an optional feature and does not affect JavaScript projects. If you are using TypeScript, you will benefit from type safety and IntelliSense.
+
 ## Usage
 
 Here's a quick example to get you started:
@@ -20,17 +24,21 @@ import useDeckOfCards from "usedeckofcards";
 function App() {
   const {
     deckId,
-    cardsRemaining,
+    isLoading,
     pileCards,
+    cardsRemaining,
     drawAndAddToPile,
     moveCardsBetweenPiles,
     resetGame,
     initializeDeck,
   } = useDeckOfCards();
 
+  const handleDrawCard = () => {
+    drawAndAddToPile("discard", 1);
+  };
+
   const handleMoveCards = () => {
     const cards = pileCards.map((card) => card.code).join(",");
-    // Example: Move cards from "hand" pile to "discard" pile
     moveCardsBetweenPiles("hand", "discard", cards);
   };
 
@@ -38,9 +46,28 @@ function App() {
     <div>
       <h1>Deck ID: {deckId}</h1>
       <p>Cards Remaining: {cardsRemaining}</p>
-      <button onClick={() => drawAndAddToPile("discard", 1)}>Draw Card</button>
-      <button onClick={handleMoveCards}>Move Cards</button>
-      <button onClick={resetGame}>Reset Deck</button>
+      <button onClick={handleDrawCard} disabled={isLoading}>
+        Draw Card
+      </button>
+      <button onClick={handleMoveCards} disabled={isLoading}>
+        Move Cards
+      </button>
+      <button onClick={resetGame} disabled={isLoading}>
+        Reset Deck
+      </button>
+
+      <h2>Pile Cards</h2>
+      <div>
+        {pileCards.map((card, index) => (
+          <div key={index}>
+            <img src={card.image} alt={`${card.value} of ${card.suit}`} />
+            <p>
+              {card.value} of {card.suit}
+            </p>
+            <p>Pile: {card.pileName}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -48,65 +75,39 @@ function App() {
 export default App;
 ```
 
-## API Integration
+## Hook Return Values
 
-The hook interacts with the Deck of Cards API to manage the deck. The following API calls are used:
+The `useDeckOfCards` hook provides the following values and functions to manage your card deck:
 
-**1. Shuffle New Deck**
-
-```jsx
-const response = await shuffleNewDeck(deckCount);
-```
-
-- `deckCount` The number of decks to shuffle (default is 1).
-- `Response:`
-  - `deck_id` The ID of the new deck.
-
-**2. Draw Cards**
-
-```jsx
-const response = await drawFromMainDeck(deckId, count);
-```
-
-- `deckId` The ID of the deck to draw from.
-- `count` The number of cards to draw.
-- `Response:`
-  - `cards` An array of drawn cards.
-
-**3. Reshuffle Deck**
-
-```jsx
-const response = await reshuffleDeck(deckId, remaining);
-```
-
-- `deckId` The ID of the deck to reshuffle.
-- `remaining` A boolean indicating whether to only shuffle the remaining cards.
-
-**4. Add to Pile**
-
-```jsx
-const response = await addToPile(deckId, pileName, cards);
-```
-
-- `deckId` The ID of the deck.
-- `pileName` The name of the pile.
-- `cards` The codes of the cards to add to the pile.
-
-**5. List and Fetch Pile Cards**
-
-```jsx
-const response = await listPileCards(deckId, pileName);
-```
-
-- `deckId` The ID of the deck.
-- `pileName` The name of the pile.
-
-**6. Move Cards Between Piles**
-
-```jsx
-const response = await moveCardsBetweenPiles(sourcePile, targetPile, cards);
-```
-
-- `sourcePile` The name of the source pile.
-- `targetPile` The name of the target pile.
-- `cards` A comma-separated string of card codes to move.
+- **deckId:** The ID of the current deck.
+  ```typescript
+  string | null;
+  ```
+- **isLoading:** A flag indicating whether an operation is in progress.
+  ```typescript
+  boolean;
+  ```
+- **pileCards:** An array of cards in the current pile.
+  ```typescript
+  Card[]
+  ```
+- **cardsRemaining:** The number of cards remaining in the deck.
+  ```typescript
+  number;
+  ```
+- **drawAndAddToPile:** Draws cards from the deck and adds them to a specified pile.
+  ```typescript
+  (pileName: string, count?: number) => Promise<void>;
+  ```
+- **moveCardsBetweenPiles:** Moves cards between piles.
+  ```typescript
+  (sourcePile: string, targetPile: string, cards: string) => Promise<void>;
+  ```
+- **resetGame:** Resets the game by reshuffling the deck and clearing the piles.
+  ```typescript
+  () => Promise<void>;
+  ```
+- **initializeDeck:** Initializes the deck by fetching deck data and setting up the piles.
+  ```typescript
+  () => Promise<void>;
+  ```
